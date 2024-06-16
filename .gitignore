@@ -1,0 +1,7 @@
+/env/*
+/datasets/*
+/model_trained/*
+/data/*
+
+__pycache__/
+*.py[cod]
