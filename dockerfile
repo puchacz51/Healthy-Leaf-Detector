@@ -7,6 +7,7 @@ EXPOSE 443
 COPY ./script .
 
 RUN pip install --no-cache-dir -r requirements.txt
+RUN python ./app.py
 
 ENV PYTHONUNBUFFERED=1
 
