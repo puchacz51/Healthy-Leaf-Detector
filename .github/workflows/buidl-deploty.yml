@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  build-container:
+  build-and-deploy:
     runs-on: ubuntu-latest
     
     steps:
@@ -25,3 +25,11 @@ jobs:
         run: |
           docker buildx build --platform linux/amd64 -t wtumimage.azurecr.io/wtum:latest .
           docker push wtumimage.azurecr.io/wtum:latest
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'your-app-name'  # Replace with your Azure App Service name
+          images: |
+            wtumimage.azurecr.io/wtum:latest
+          slot-name: 'production'  # Optional: Specify deployment slot if needed
