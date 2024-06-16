@@ -1,6 +1,8 @@
 FROM python:3.12
 
 WORKDIR /src
+EXPOSE 80
+EXPOSE 443
 
 COPY ./script .
 
