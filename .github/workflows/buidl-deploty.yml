@@ -22,11 +22,11 @@ jobs:
     - name: Build and push Docker image
       run: |
         docker build . -t my-python-app
-        docker tag my-python-app <your-azure-registry-name>.azurecr.io/my-python-app
-        docker push <your-azure-registry-name>.azurecr.io/my-python-app
+        docker tag my-python-app wtumimage.azurecr.io/my-python-app
+        docker push wtumimage.azurecr.io/my-python-app
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: <your-azure-web-app-name>
-        images: '<your-azure-registry-name>.azurecr.io/my-python-app:latest'
+        app-name: test
+        images: 'wtumimage.azurecr.io/my-python-app:latest'
