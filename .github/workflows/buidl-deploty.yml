@@ -1,5 +1,3 @@
-# .github/workflows/azure-python-docker.yml
-
 name: Deploy to Azure
 
 on:
@@ -18,6 +16,13 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Login to Azure Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: wtumimage.azurecr.io
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
 
     - name: Build and push Docker image
       run: |
