@@ -1,58 +1,62 @@
-from utils import dataset_loader
-from utils import train_model
-from models_schema.modelCNN import LeafClassifier
-from models_schema.modelResNet import ResNetModel
-from utils.prepare_data import get_train_loader
-from utils.dictionary import data_path
-from utils.train_model import train_model,prepare_model
-from utils.history import save_history
+import gradio as gr
 import torch
-import torch.optim as optim
 import torch.nn as nn
-import os 
-import time
-if __name__ == "__main__":
-    dataset_loader.prepare_data()
-    print("Dane zostały przygotowane.")
-    device = (torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu'))
-    print(f"Urządzenie: {device}")
+from torchvision import transforms
+from PIL import Image
+from models_schema.modelCNN import LeafClassifier as CNNLeafClassifier
+from models_schema.modelResNet import ResNetModel as ResNetLeafClassifier
+
+def classify_leaf(image, model_name):
+    # Definicja transformacji dla obrazów wejściowych
+    transform = transforms.Compose([
+        transforms.Resize((128, 128)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
     
+    # Wybór modelu na podstawie argumentu model_name
+    if "resnet" in model_name.lower():
+        LeafClassifier = ResNetLeafClassifier
+        model_path = f'{models_path.home}/{model_name}'
+    else:
+        LeafClassifier = CNNLeafClassifier
+        model_path = f'{models_path.home}/{model_name}'
 
-    train_loader = get_train_loader(data_path.train)
-    modelResNet = prepare_model(device, ResNetModel)
-    modelCNN = prepare_model(device, LeafClassifier)
-
-    optimizerCNN = optim.Adam(modelCNN.parameters(), lr=0.001)
-    optimizerResNet = optim.Adam(modelResNet.parameters(), lr=0.001)
-    criterionCNN = nn.BCELoss()
-    criterionResNet = nn.BCEWithLogitsLoss()
-
-
-    train_dateils_Resnt = train_model(modelResNet, device,train_loader , criterionResNet, optimizerResNet, 10)
-    print("Model ResNet został wytrenowany.")
-
-    train_dateils_CNN =  train_model(modelCNN, device, train_loader, criterionCNN, optimizerCNN, 10)
-
-    print("Model CNN został wytrenowany.")
-
-    # save_history(train_dateils_Resnt, "ResNet")
-    save_history(train_dateils_CNN, "CNN"+ time.strftime("%Y%m%d-%H%M%S")   )
-    save_history(train_dateils_Resnt, "ResNet" + time.strftime("%Y%m%d-%H%M%S") )
-    print("Historia została zapisana.")
-    print("Koniec programu.")
-
-    # save the model
-    if not os.path.exists(data_path.model_storage):
-        os.makedirs(data_path.model_storage, exist_ok=True)
+    # Konwertowanie obrazu do postaci tensora
+    image = Image.fromarray(image)
+    tensor_image = transform(image).unsqueeze(0)
     
-    torch.save(modelResNet, data_path.model_storage + "/modelResNet"+time.strftime("%Y%m%d-%H%M%S")+".pth")
-    torch.save(modelCNN, data_path.model_storage + "/modelCNN" + time.strftime("%Y%m%d-%H%M%S")+".pth")
-    # print(os.listdir(data_path.model_storage))
-    # # upload the model
-    # models = os.listdir(data_path.model_storage)
-    # root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-    # absolute_models_path = [os.path.join(root_path, data_path.model_storage, model) for model in models]
-    # for model in absolute_models_path:
-    #     print(f"Wgrywanie modelu {model} na serwer.")
-    #     dataset_loader.upload_model(model, model.split("/")[-1])
-    # print("Model został wgrany na serwer.")
+    # Wczytanie modelu
+    model = LeafClassifier()
+    model.load_state_dict(torch.load(model_path))
+    model.eval()
+    
+    # Predykcja
+    with torch.no_grad():
+        output = model(tensor_image)
+    
+    if output.item() > 0.5:
+        return "Liść wygląda na zdrowy."
+    else:
+        return "Podejrzewam chorobę liścia."
+
+# Lista dostępnych modeli do wyboru w UI
+model_options = [
+    {"label": "CNN Leaf Classifier", "value": "cnn_model.pt"},
+    {"label": "ResNet Leaf Classifier", "value": "resnet_model.pt"}
+]
+
+# Tworzenie interfejsu Gradio z wyborem modelu
+iface = gr.Interface(
+    fn=classify_leaf, 
+    inputs=["image", gr.inputs.Dropdown(choices=model_options, label="Wybierz model")],
+    outputs="text", 
+    title="Detekcja chorób liści", 
+    description="Wrzuć zdjęcie liścia, a model spróbuje określić, czy jest zdrowy czy chory.",
+    examples=[
+        ['leaf.jpg', "cnn_model.pt"], ['another_leaf.png', "resnet_model.pt"]
+    ]
+)
+
+# Uruchomienie interfejsu
+iface.launch()

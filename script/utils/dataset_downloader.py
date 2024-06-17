@@ -6,7 +6,7 @@ class DatasetDownloader:
     def __init__(self):
         self.azure_blob_url = os.getenv(
             'AZURE_BLOB_URL', 
-            'https://datasetkaggle.blob.core.windows.net/dataset/original.zip?sp=r&st=2024-06-16T08:50:41Z&se=2024-06-16T16:50:41Z&spr=https&sv=2022-11-02&sr=b&sig=5u5GAPNcpkKS5wlRup8RdZOZ6t8ItO%2BciyHWJF4urdQ%3D'
+            'https://datasetkaggle.blob.core.windows.net/dataset/original.zip?sp=r&st=2024-06-17T06:05:47Z&se=2024-06-22T14:05:47Z&spr=https&sv=2022-11-02&sr=b&sig=1sTmWWMO2iE1xNbtgkOaSyML6wp2GD74R7H0N4%2BDCCM%3D'
         )
         self.azure_model_blob_key = os.getenv(
             'AZURE_MODEL_BLOB_KEY',
