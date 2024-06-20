@@ -15,9 +15,11 @@ class PathConfig:
         self.processed_healthy = os.getenv('PROCESSED_HEALTHY_DATA_PATH', 'data/processed/healthy')
         self.processed_disease = os.getenv('PROCESSED_DISEASE_DATA_PATH', 'data/processed/disease')
 
+        self.train = os.getenv('TRAIN_DATA_PATH', 'data/train')
         self.train_healthy = os.getenv('TRAIN_HEALTHY_DATA_PATH', 'data/train/healthy')
         self.train_disease = os.getenv('TRAIN_DISEASE_DATA_PATH', 'data/train/disease')
 
+        self.val = os.getenv('VAL_DATA_PATH', 'data/val')
         self.val_healthy = os.getenv('VAL_HEALTHY_DATA_PATH', 'data/val/healthy')
         self.val_disease = os.getenv('VAL_DISEASE_DATA_PATH', 'data/val/disease')
 

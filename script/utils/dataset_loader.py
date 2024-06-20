@@ -15,7 +15,8 @@ def prepare_data():
     else:
         print("Dane zostały już pobrane.")
 
-    if not os.listdir(data_path.train_healthy) or not len(os.listdir(data_path.train_disease)): 
+#  check if divided data exists without errors on not fount
+    if not os.path.exists(data_path.train_healthy) or not os.listdir(data_path.train_healthy): 
         split()
     else:
         print("Dane zostały już podzielone.")

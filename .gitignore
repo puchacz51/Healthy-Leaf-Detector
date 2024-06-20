@@ -2,6 +2,7 @@
 /datasets/*
 /model_trained/*
 /data/*
+/data1/*
 
 __pycache__/
 *.py[cod]
