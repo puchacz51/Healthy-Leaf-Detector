@@ -4,7 +4,7 @@ class PathConfig:
     def __init__(self):
         self.train = os.getenv('TRAIN_DATA_PATH', 'data/train')
         self.history = os.getenv('HISTORY_PATH', 'history')
-        self.home = os.getenv('MODELS_PATH', 'models')
+        self.home = os.getenv('MODELS_PATH', './model_trained')
         self.test = os.getenv('TEST_DATA_PATH', 'data/test')
         self.model_storage = os.getenv('MODEL_STORAGE_PATH', 'model_trained')
         self.dataset_path = os.getenv('DATASET_PATH', 'data/orginal')
