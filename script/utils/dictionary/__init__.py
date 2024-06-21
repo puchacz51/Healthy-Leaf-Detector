@@ -2,6 +2,14 @@ import os
 
 class PathConfig:
     def __init__(self):
+        current_path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+        root_path = current_path.split("\\")[:-2] 
+        root_path = "\\".join(root_path)
+        
+
+        
+        self.root = os.getenv('ROOT_PATH', root_path)
+        
         self.train = os.getenv('TRAIN_DATA_PATH', 'data/train')
         self.history = os.getenv('HISTORY_PATH', 'history')
         self.home = os.getenv('MODELS_PATH', './model_trained')

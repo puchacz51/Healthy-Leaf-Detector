@@ -6,6 +6,7 @@ from utils.prepare_data import get_train_loader
 from utils.dictionary import data_path
 from utils.train_model import train_model,prepare_model
 from utils.history import save_history
+from utils .dataset_loader import upload_model
 import torch
 import torch.optim as optim
 import torch.nn as nn
@@ -28,10 +29,10 @@ if __name__ == "__main__":
     criterionResNet = nn.BCEWithLogitsLoss()
 
 
-    train_dateils_Resnt = train_model(modelResNet, device,train_loader , criterionResNet, optimizerResNet, 10)
+    train_dateils_Resnt = train_model(modelResNet, device,train_loader , criterionResNet, optimizerResNet, 1)
     print("Model ResNet został wytrenowany.")
 
-    train_dateils_CNN =  train_model(modelCNN, device, train_loader, criterionCNN, optimizerCNN, 10)
+    train_dateils_CNN =  train_model(modelCNN, device, train_loader, criterionCNN, optimizerCNN, 1)
 
     print("Model CNN został wytrenowany.")
 
@@ -45,8 +46,17 @@ if __name__ == "__main__":
     if not os.path.exists(data_path.model_storage):
         os.makedirs(data_path.model_storage, exist_ok=True)
     
-    torch.save(modelResNet, data_path.model_storage + "/modelResNet"+time.strftime("%Y%m%d-%H%M%S")+".pth")
-    torch.save(modelCNN, data_path.model_storage + "/modelCNN" + time.strftime("%Y%m%d-%H%M%S")+".pth")
+    modelCNNName = data_path.model_storage + "/modelCNN" + time.strftime("%Y%m%d-%H%M%S") + ".pth"
+    modelResNetName = data_path.model_storage + "/modelResNet" + time.strftime("%Y%m%d-%H%M%S") + ".pth"
+    torch.save(modelResNet, data_path.model_storage + modelResNetName )
+    torch.save(modelCNN, data_path.model_storage + modelResNetName)
+
+    upload_model(modelCNNName)
+    upload_model(modelResNetName)
+    print("Model został zapisany.")
+
+    #
+    
     # print(os.listdir(data_path.model_storage))
     # # upload the model
     # models = os.listdir(data_path.model_storage)
