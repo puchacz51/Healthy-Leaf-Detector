@@ -30,8 +30,14 @@ if __name__ == "__main__":
 
     if not os.path.exists(data_path.model_storage):
         os.makedirs(data_path.model_storage, exist_ok=True)
-
-    train_dateils_Resnt = train_model(modelResNet, device,train_loader , criterionResNet, optimizerResNet, 10)
+    #test upload some txt file
+    # create txt file
+    with open(data_path.model_storage + "/test.txt", "w") as file:
+        file.write("Testowy plik.")
+    # upload txt file
+    dataset_loader.upload_model(data_path.model_storage + "/test.txt", "test.txt")
+    print("Testowy plik został wgrany na serwer.") 
+    train_dateils_Resnt = train_model(modelResNet, device,train_loader , criterionResNet, optimizerResNet, 3)
     print("Model ResNet został wytrenowany.")
     modelResNetName = data_path.model_storage + "/modelResNet" + time.strftime("%Y%m%d-%H%M%S") + ".pth"
 # seve dict of that model
@@ -41,7 +47,7 @@ if __name__ == "__main__":
     print("Model ResNet został wgrany na serwer.")
     save_history(train_dateils_Resnt, "ResNet" + time.strftime("%Y%m%d-%H%M%S") )
 
-    train_dateils_CNN =  train_model(modelCNN, device, train_loader, criterionCNN, optimizerCNN, 10)
+    train_dateils_CNN =  train_model(modelCNN, device, train_loader, criterionCNN, optimizerCNN, 3)
 
     print("Model CNN został wytrenowany.")
     modelCNNName = data_path.model_storage + "/modelCNN" + time.strftime("%Y%m%d-%H%M%S") + ".pth"
