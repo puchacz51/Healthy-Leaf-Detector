@@ -22,5 +22,5 @@ def prepare_data():
         print("Dane zostały już podzielone.")
 
 def upload_model( model_name):
-    DatasetDownloader = DatasetDownloader()
-    DatasetDownloader.upload_image_to_blob(model_name)
+    datasetDownloader = DatasetDownloader()
+    datasetDownloader.upload_image_to_blob(model_name)
