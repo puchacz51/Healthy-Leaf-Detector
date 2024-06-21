@@ -3,7 +3,7 @@ name: Deploy to Azure
 on:
   push:
     branches:
-      - '*'  # Wyzwalaj dla każdego commita na dowolnej gałęzi
+      - '*'  # Trigger on any branch commit
 
 jobs:
   build-and-deploy:
@@ -30,9 +30,20 @@ jobs:
         docker tag my-python-app wtumimage.azurecr.io/my-python-app
         docker push wtumimage.azurecr.io/my-python-app
 
+    - name: Check if Azure Container Instance exists
+      id: check-aci
+      run: |
+        aci_name="my-container-instance"
+        aci_exists=$(az container show --resource-group myResourceGroup --name $aci_name --query "name" -o tsv || echo "")
+        echo "::set-output name=exists::$aci_exists"
+
+    - name: Delete existing Azure Container Instance
+      if: steps.check-aci.outputs.exists != ''
+      run: |
+        az container delete --resource-group myResourceGroup --name my-container-instance --yes
+
     - name: Deploy to Azure Container Instance
       run: |
-        az group create --name myResourceGroup --location eastus
         az container create --resource-group myResourceGroup --name my-container-instance \
           --image wtumimage.azurecr.io/my-python-app:latest --cpu 4 --memory 8 \
           --registry-login-server wtumimage.azurecr.io --registry-username ${{ secrets.ACR_USERNAME }} \
