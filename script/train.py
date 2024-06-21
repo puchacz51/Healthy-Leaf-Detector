@@ -35,7 +35,7 @@ if __name__ == "__main__":
     with open(data_path.model_storage + "/test.txt", "w") as file:
         file.write("Testowy plik.")
     # upload txt file
-    dataset_loader.upload_model(data_path.model_storage + "/test.txt", "test.txt")
+    dataset_loader.upload_model( "test.txt")
     print("Testowy plik został wgrany na serwer.") 
     train_dateils_Resnt = train_model(modelResNet, device,train_loader , criterionResNet, optimizerResNet, 3)
     print("Model ResNet został wytrenowany.")
