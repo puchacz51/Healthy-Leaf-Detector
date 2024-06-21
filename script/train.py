@@ -28,32 +28,37 @@ if __name__ == "__main__":
     criterionCNN = nn.BCELoss()
     criterionResNet = nn.BCEWithLogitsLoss()
 
-
-    train_dateils_Resnt = train_model(modelResNet, device,train_loader , criterionResNet, optimizerResNet, 1)
-    print("Model ResNet został wytrenowany.")
-
-    train_dateils_CNN =  train_model(modelCNN, device, train_loader, criterionCNN, optimizerCNN, 1)
-
-    print("Model CNN został wytrenowany.")
-
-    # save_history(train_dateils_Resnt, "ResNet")
-    save_history(train_dateils_CNN, "CNN"+ time.strftime("%Y%m%d-%H%M%S")   )
-    save_history(train_dateils_Resnt, "ResNet" + time.strftime("%Y%m%d-%H%M%S") )
-    print("Historia została zapisana.")
-    print("Koniec programu.")
-
-    # save the model
     if not os.path.exists(data_path.model_storage):
         os.makedirs(data_path.model_storage, exist_ok=True)
-    
-    modelCNNName = data_path.model_storage + "/modelCNN" + time.strftime("%Y%m%d-%H%M%S") + ".pth"
-    modelResNetName = data_path.model_storage + "/modelResNet" + time.strftime("%Y%m%d-%H%M%S") + ".pth"
-    torch.save(modelResNet, data_path.model_storage + modelResNetName )
-    torch.save(modelCNN, data_path.model_storage + modelResNetName)
 
-    upload_model(modelCNNName)
+    train_dateils_Resnt = train_model(modelResNet, device,train_loader , criterionResNet, optimizerResNet, 10)
+    print("Model ResNet został wytrenowany.")
+    modelResNetName = data_path.model_storage + "/modelResNet" + time.strftime("%Y%m%d-%H%M%S") + ".pth"
+# seve dict of that model
+    torch.save(modelResNet.state_dict(), modelResNetName)   
+    print("Model ResNet został zapisany.")
     upload_model(modelResNetName)
+    print("Model ResNet został wgrany na serwer.")
+    save_history(train_dateils_Resnt, "ResNet" + time.strftime("%Y%m%d-%H%M%S") )
+
+    train_dateils_CNN =  train_model(modelCNN, device, train_loader, criterionCNN, optimizerCNN, 10)
+
+    print("Model CNN został wytrenowany.")
+    modelCNNName = data_path.model_storage + "/modelCNN" + time.strftime("%Y%m%d-%H%M%S") + ".pth"
+    save_history(train_dateils_CNN, "CNN"+ time.strftime("%Y%m%d-%H%M%S")   )
+    print("Historia została zapisana.")
+    torch.save(modelCNN.state_dict(), data_path.model_storage + modelCNNName)
+    upload_model(modelCNNName)
     print("Model został zapisany.")
+
+    # infinity loop
+    while True:
+        time.sleep(1)
+        
+
+
+    # save the model
+    
 
     #
     
