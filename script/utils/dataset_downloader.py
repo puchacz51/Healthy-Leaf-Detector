@@ -1,43 +1,63 @@
 import os
 import zipfile
-from azure.storage.blob import BlobClient
-from utils.upload_images import upload_model
+from azure.storage.blob import BlobServiceClient, BlobClient
 from utils.dictionary import data_path
+
 class DatasetDownloader:
     def __init__(self):
-        self.azure_blob_url = os.getenv(
-            'AZURE_BLOB_URL', 
-            'https://datasetkaggle.blob.core.windows.net/dataset/original.zip?sp=r&st=2024-06-17T06:05:47Z&se=2024-06-22T14:05:47Z&spr=https&sv=2022-11-02&sr=b&sig=1sTmWWMO2iE1xNbtgkOaSyML6wp2GD74R7H0N4%2BDCCM%3D'
+        self.azure_storage_account_name = os.getenv('AZURE_STORAGE_ACCOUNT_NAME', 'datasetkaggle')
+        self.azure_storage_account_key = os.getenv('AZURE_STORAGE_ACCOUNT_KEY', '')
+        self.container_name = os.getenv('AZURE_CONTAINER_NAME', 'dataset')
+        self.blob_name = os.getenv('AZURE_BLOB_NAME', 'original.zip')
+        self.model_container_name = os.getenv('AZURE_MODEL_CONTAINER_NAME', 'models')
+        self.history_container_name = os.getenv('AZURE_HISTORY_CONTAINER_NAME', 'history')
+
+        self.blob_service_client = BlobServiceClient(
+            account_url=f"https://{self.azure_storage_account_name}.blob.core.windows.net",
+            credential=self.azure_storage_account_key
         )
-        self.azure_model_blob_key = os.getenv(
-            'AZURE_MODEL_BLOB_KEY',
-            'sp=ra&st=2024-06-16T17:22:47Z&se=2024-06-21T01:22:47Z&spr=https&sv=2022-11-02&sr=c&sig=ZOtSJpgEy3ER2wi971kDZa9gc4mwYcfOTgS1KI7hTuM%3D'
-        )
-        self.azure_model_blob_url = os.getenv(
-            'AZURE_MODEL_BLOB_URL',
-            'https://datasetkaggle.blob.core.windows.net/models')
-        self.azure_model_blob_key = os.getenv('AZURE_MODEL_BLOB_KEY',  "sp=racwdl&st=2024-06-21T06:42:47Z&se=2024-06-30T14:42:47Z&spr=https&sv=2022-11-02&sr=c&sig=Y2%2BzjQGa6tPMr7TjkjfdyL0Om%2FCYaXa2ZgWvhKGqSd8%3D")
     
     def download_blob(self, download_file_path):
-        # Utwórz klienta BlobClient za pomocą pełnego URL z SAS tokenem
-        blob_client = BlobClient.from_blob_url(self.azure_blob_url)
-        print(f"Pobieranie z {blob_client.url}")
+        # Create BlobClient using the account name and key
+        blob_client = self.blob_service_client.get_blob_client(container=self.container_name, blob=self.blob_name)
+        print(f"Downloading from {blob_client.url}")
 
         with open(download_file_path, "wb") as download_file:
             download_stream = blob_client.download_blob()
             download_file.write(download_stream.readall())
         
-        print(f"Pobieranie zakończone! Plik zapisano jako {download_file_path}")
+        print(f"Download complete! File saved as {download_file_path}")
         
         self.unzip_file(download_file_path)
         
+        
         os.remove(download_file_path)
-        print(f"Plik ZIP {download_file_path} został usunięty.")
+        print(f"ZIP file {download_file_path} has been deleted.")
     
     def unzip_file(self, file_path):
         with zipfile.ZipFile(file_path, 'r') as zip_ref:
             zip_ref.extractall(os.path.dirname(file_path))
-        print(f"Plik {file_path} został rozpakowany.")
+        print(f"File {file_path} has been unzipped.")
         
-    def upload_image_to_blob(self,  blob_name):
-        return upload_model(self.azure_model_blob_url, self.azure_model_blob_key,  blob_name)
+    def upload_model(self, file_path, blob_name):
+        # Create BlobClient for the destination blob
+        blob_client = self.blob_service_client.get_blob_client(container=self.model_container_name, blob=blob_name)
+        print(f"Uploading to {blob_client.url}")
+
+        with open(file_path, "rb") as data:
+            blob_client.upload_blob(data, overwrite=True)
+        
+        print(f"Upload complete! File {file_path} has been uploaded as {blob_name}.")
+
+    def upload_history(self, file_path, blob_name):
+        # Create BlobClient for the destination blob
+        blob_client = self.blob_service_client.get_blob_client(container=self.history_container_name, blob=blob_name)
+        print(f"Uploading to {blob_client.url}")
+
+        with open(file_path, "rb") as data:
+            blob_client.upload_blob(data, overwrite=True)
+        
+        print(f"Upload complete! File {file_path} has been uploaded as {blob_name}.")
+
+# Example usage
+downloader = DatasetDownloader()

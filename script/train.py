@@ -6,7 +6,7 @@ from utils.prepare_data import get_train_loader
 from utils.dictionary import data_path
 from utils.train_model import train_model,prepare_model
 from utils.history import save_history
-from utils .dataset_loader import upload_model
+from utils.dataset_downloader import DatasetDownloader
 import torch
 import torch.optim as optim
 import torch.nn as nn
@@ -14,11 +14,11 @@ import os
 import time
 if __name__ == "__main__":
     dataset_loader.prepare_data()
+    downloader = DatasetDownloader()
     print("Dane zostały przygotowane.")
     device = (torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu'))
     print(f"Urządzenie: {device}")
     
-    upload_model("test.txt")
     train_loader = get_train_loader(data_path.train)
     modelResNet = prepare_model(device, ResNetModel)
     modelCNN = prepare_model(device, LeafClassifier)
@@ -35,26 +35,31 @@ if __name__ == "__main__":
     with open(os.path.join(data_path.model_storage, 'test.txt'), "w") as file:
         file.write("Testowy plik.")
     # upload txt file
-    dataset_loader.upload_model( "test.txt")
+    downloader.upload_model(os.path.join(data_path.model_storage, 'test.txt'), "test.txt")
     print("Testowy plik został wgrany na serwer.") 
     train_dateils_Resnt = train_model(modelResNet, device,train_loader , criterionResNet, optimizerResNet, 1)
     print("Model ResNet został wytrenowany.")
     modelResNetName =  "modelResNet" + time.strftime("%Y%m%d-%H%M%S") + ".pth"
+    modelResNetPath = os.path.join(data_path.model_storage, modelResNetName)
 # seve dict of that model
-    torch.save(modelResNet.state_dict(), os.path.join(data_path.model_storage, modelResNetName))   
+    torch.save(modelResNet.state_dict(),modelResNetPath)   
     print("Model ResNet został zapisany.")
-    upload_model(modelResNetName)
+    downloader.upload_model(modelResNetPath,modelResNetName)
     print("Model ResNet został wgrany na serwer.")
-    save_history(train_dateils_Resnt, "ResNet" + time.strftime("%Y%m%d-%H%M%S") )
+    historyResNetPath =  "ResNet" + time.strftime("%Y%m%d-%H%M%S")
+    save_history(train_dateils_Resnt, historyResNetPath)  
+    downloader.upload_history(historyResNetPath, historyResNetPath)
 
     train_dateils_CNN =  train_model(modelCNN, device, train_loader, criterionCNN, optimizerCNN, 1)
 
     print("Model CNN został wytrenowany.")
     modelCNNName = "modelCNN" + time.strftime("%Y%m%d-%H%M%S") + ".pth"
-    save_history(train_dateils_CNN, "CNN"+ time.strftime("%Y%m%d-%H%M%S")   )
+    modelCNNPath = os.path.join(data_path.model_storage, modelCNNName)
+    historyCNNPath = "CNN" + time.strftime("%Y%m%d-%H%M%S")
+    save_history(train_dateils_CNN, historyCNNPath)  
     print("Historia została zapisana.")
-    torch.save(modelCNN.state_dict(), os.path.join(data_path.model_storage, modelCNNName))
-    upload_model(modelCNNName)
+    torch.save(modelCNN.state_dict(), modelCNNPath)
+    downloader.upload_model(modelCNNPath,modelCNNName)
     print("Model został zapisany.")
 
     # infinity loop

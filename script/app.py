@@ -7,7 +7,23 @@ from models_schema.modelCNN import LeafClassifier as CNNLeafClassifier
 from models_schema.modelResNet import ResNetModel as ResNetLeafClassifier
 import os
 # Define the model path variable
+
+azure_storage_account_name = os.getenv('AZURE_STORAGE_ACCOUNT_NAME', 'datasetkaggle')
+azure_storage_account_key = os.getenv('AZURE_STORAGE_ACCOUNT_KEY', 'kk')
+azure_model_container_name = os.getenv('AZURE_MODEL_CONTAINER_NAME', 'models')
+azure_history_container_name = os.getenv('AZURE_HISTORY_CONTAINER_NAME', 'history')
+
+# get all models from azure
+blob_service_client = BlobServiceClient(
+    account_url=f"https://{azure_storage_account_name}.blob.core.windows.net",
+    credential=azure_storage_account_key
+)
+
+
+
 models_path = {'home': './model_trained'}
+
+
 
 def classify_leaf(image, model_name):
     # Definicja transformacji dla obrazów wejściowych
