@@ -32,7 +32,7 @@ if __name__ == "__main__":
         os.makedirs(data_path.model_storage, exist_ok=True)
     #test upload some txt file
     # create txt file
-    with open(data_path.model_storage + "/test.txt", "w") as file:
+    with open(os.path.join(data_path.model_storage, 'test.txt'), "w") as file:
         file.write("Testowy plik.")
     # upload txt file
     dataset_loader.upload_model( "test.txt")
