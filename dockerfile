@@ -3,11 +3,9 @@ FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
 
 WORKDIR /src
 
-EXPOSE 80
-EXPOSE 443
-EXPOSE 7860
 
-COPY ./script .
+
+COPY ../script .
 
 RUN apt-get update && apt-get install -y \
     python3 \

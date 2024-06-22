@@ -24,11 +24,19 @@ jobs:
         username: ${{ secrets.ACR_USERNAME }}
         password: ${{ secrets.ACR_PASSWORD }}
 
-    - name: Build and push Docker image
+    - name: Build and push Docker image for main app
       run: |
         docker build . -t my-python-app
         docker tag my-python-app wtumimage.azurecr.io/my-python-app
         docker push wtumimage.azurecr.io/my-python-app
+
+    - name: Build and push Docker image for web app
+      run: |
+        cd webapp
+        docker build . -t my-web-app
+        docker tag my-web-app wtumimage.azurecr.io/my-web-app
+        docker push wtumimage.azurecr.io/my-web-app
+        cd ..
 
     - name: Check if Azure Container Instance exists
       id: check-aci
@@ -50,3 +58,24 @@ jobs:
           --registry-password ${{ secrets.ACR_PASSWORD }} --dns-name-label my-container-instance \
           --ports 80 \
           --environment-variables "AZURE_STORAGE_ACCOUNT_KEY=${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}"
+
+    - name: Check if Azure Web App exists
+      id: check-webapp
+      run: |
+        webapp_name="my-web-app"
+        webapp_exists=$(az webapp show --resource-group myResourceGroup --name $webapp_name --query "name" -o tsv || echo "")
+        echo "::set-output name=exists::$webapp_exists"
+
+    - name: Create Azure Web App if not exists
+      if: steps.check-webapp.outputs.exists == ''
+      run: |
+        az webapp create --resource-group myResourceGroup --plan myAppServicePlan --name my-web-app \
+          --deployment-container-image-name wtumimage.azurecr.io/my-web-app:latest
+
+    - name: Configure Azure Web App with Docker container
+      run: |
+        az webapp config container set --resource-group myResourceGroup --name my-web-app \
+          --docker-custom-image-name wtumimage.azurecr.io/my-web-app:latest \
+          --docker-registry-server-url https://wtumimage.azurecr.io \
+          --docker-registry-server-user ${{ secrets.ACR_USERNAME }} \
+          --docker-registry-server-password ${{ secrets.ACR_PASSWORD }}
