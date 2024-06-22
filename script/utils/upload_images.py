@@ -11,7 +11,7 @@ def upload_model(base_url, sas_token,  model_name):
     :param model_name: Nazwa pliku modelu do przesłania.
     """
     model_path = os.path.join(data_path.root, data_path.model_storage, model_name)
-    
+    print(data_path.root, data_path.model_storage, model_name)
     # Pełny URL z nazwą pliku
     url = f"{base_url}/{model_name}?{sas_token}"
     

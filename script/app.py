@@ -17,8 +17,6 @@ def classify_leaf(image, model_name):
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
     
-    print(models_path["home"])
-    print(os.listdir(models_path["home"]))
 
     # Wybór modelu na podstawie argumentu model_name
     if "resnet" in model_name.lower():
@@ -37,7 +35,8 @@ def classify_leaf(image, model_name):
     tensor_image = transform(image).unsqueeze(0)
     
     # Wczytanie modelu
-    model = torch.load(model_path)
+    model = LeafClassifier()
+    model.load_state_dict(torch.load(model_path))
     model.eval()
     
     # Predykcja
@@ -50,10 +49,12 @@ def classify_leaf(image, model_name):
         return "Podejrzewam chorobę liścia."
 
 # Lista dostępnych modeli do wyboru w UI
-model_options = [
-    "modelCNN.pth",
-    "modelResNet.pth"
-]
+# model_options = [
+#     "modelCNN.pth",
+#     "modelResNet.pth"
+# ]
+model_options = os.listdir(models_path["home"])
+
 
 # Tworzenie interfejsu Gradio z wyborem modelu
 iface = gr.Interface(
