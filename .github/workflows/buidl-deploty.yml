@@ -49,4 +49,4 @@ jobs:
           --registry-login-server wtumimage.azurecr.io --registry-username ${{ secrets.ACR_USERNAME }} \
           --registry-password ${{ secrets.ACR_PASSWORD }} --dns-name-label my-container-instance \
           --ports 80 \
-          --environment-variables "STORAGE_KEY=${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}"
+          --environment-variables "AZURE_STORAGE_ACCOUNT_KEY=${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}"
