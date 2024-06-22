@@ -37,7 +37,7 @@ if __name__ == "__main__":
     # upload txt file
     downloader.upload_model(os.path.join(data_path.model_storage, 'test.txt'), "test.txt")
     print("Testowy plik został wgrany na serwer.") 
-    train_dateils_Resnt = train_model(modelResNet, device,train_loader , criterionResNet, optimizerResNet, 1)
+    train_dateils_Resnt = train_model(modelResNet, device,train_loader , criterionResNet, optimizerResNet, 10)
     print("Model ResNet został wytrenowany.")
     modelResNetName =  "modelResNet" + time.strftime("%Y%m%d-%H%M%S") + ".pth"
     modelResNetPath = os.path.join(data_path.model_storage, modelResNetName)
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     save_history(train_dateils_Resnt, historyResNetPath)  
     downloader.upload_history(historyResNetPath, historyResNetPath)
 
-    train_dateils_CNN =  train_model(modelCNN, device, train_loader, criterionCNN, optimizerCNN, 1)
+    train_dateils_CNN =  train_model(modelCNN, device, train_loader, criterionCNN, optimizerCNN, 10)
 
     print("Model CNN został wytrenowany.")
     modelCNNName = "modelCNN" + time.strftime("%Y%m%d-%H%M%S") + ".pth"
