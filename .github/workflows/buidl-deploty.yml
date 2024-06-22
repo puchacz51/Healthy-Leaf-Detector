@@ -48,5 +48,5 @@ jobs:
           --image wtumimage.azurecr.io/my-python-app:latest --cpu 4 --memory 8 \
           --registry-login-server wtumimage.azurecr.io --registry-username ${{ secrets.ACR_USERNAME }} \
           --registry-password ${{ secrets.ACR_PASSWORD }} --dns-name-label my-container-instance \
-          --ports 80
-          --environment-variables STORAGE_KEY=${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+          --ports 80 \
+          --environment-variables "STORAGE_KEY=${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}"
