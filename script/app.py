@@ -15,6 +15,8 @@ azure_storage_account_key = os.getenv('AZURE_STORAGE_ACCOUNT_KEY', 'kk')
 azure_model_container_name = os.getenv('AZURE_MODEL_CONTAINER_NAME', 'models')
 azure_history_container_name = os.getenv('AZURE_HISTORY_CONTAINER_NAME', 'history')
 loaded_model_path = os.getenv('MODEL_PATH', './model_trained')
+if(not os.path.exists(loaded_model_path)):
+    os.makedirs(loaded_model_path, exist_ok=True)
 
 loaded_models_list =os.listdir(loaded_model_path)
 
@@ -28,8 +30,6 @@ blob_service_client = BlobServiceClient(
 def load_models():
     list_of_models = blob_service_client.get_container_client(azure_model_container_name).list_blobs()
     # download all models ended with .pth
-    if(not os.path.exists(loaded_model_path)):
-        os.makedirs(loaded_model_path, exist_ok=True)
 
     for model in list_of_models:
         if model.name.endswith('.pth') and loaded_models_list.count(model.name) == 0:
