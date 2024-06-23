@@ -33,10 +33,10 @@ jobs:
     - name: Build and push Docker image for web app
       run: |
         cd webapp
-        docker build . -t my-web-app
+        docker build .\script -t my-web-app
         docker tag my-web-app wtumimage.azurecr.io/my-web-app
         docker push wtumimage.azurecr.io/my-web-app
-        cd ..
+        
 
     - name: Check if Azure Container Instance exists
       id: check-aci
