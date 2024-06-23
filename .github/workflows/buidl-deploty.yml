@@ -24,18 +24,18 @@ jobs:
         username: ${{ secrets.ACR_USERNAME }}
         password: ${{ secrets.ACR_PASSWORD }}
 
+    - name: Build and push Docker image for web app
+      run: |
+        docker build ./script -t my-web-app
+        docker tag my-web-app wtumimage.azurecr.io/my-web-app
+        docker push wtumimage.azurecr.io/my-web-app
+        
     - name: Build and push Docker image for main app
       run: |
         docker build . -t my-python-app
         docker tag my-python-app wtumimage.azurecr.io/my-python-app
         docker push wtumimage.azurecr.io/my-python-app
 
-    - name: Build and push Docker image for web app
-      run: |
-        docker build .\script -t my-web-app
-        docker tag my-web-app wtumimage.azurecr.io/my-web-app
-        docker push wtumimage.azurecr.io/my-web-app
-        
 
     - name: Check if Azure Container Instance exists
       id: check-aci
